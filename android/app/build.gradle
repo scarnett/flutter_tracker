@@ -1,0 +1,119 @@
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterRoot = localProperties.getProperty('flutter.sdk')
+if (flutterRoot == null) {
+    throw new GradleException('Flutter SDK not found. Define location with flutter.sdk in the local.properties file.')
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '1'
+}
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.0'
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+// flutter_background_geolocation
+Project background_geolocation = project(':flutter_background_geolocation')
+apply from: "${background_geolocation.projectDir}/background_geolocation.gradle"
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+
+    defaultConfig {
+        applicationId localProperties.getProperty('app.id')
+        minSdkVersion 21
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        multiDexEnabled true
+    }
+
+    defaultConfig {
+        manifestPlaceholders = [
+            appId: localProperties.getProperty('app.id'),
+            transistorsoftLicense: localProperties.getProperty('transistorsoft.license'),
+            adMobAppId: ADMOB_APP_ID // TODO
+        ]
+    }
+
+    signingConfigs {
+        release {
+            if (keystorePropertiesFile.exists()) {
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles "${background_geolocation.projectDir}/proguard-rules.pro"
+        }
+    }
+
+    flavorDimensions 'flavor-type'
+
+    productFlavors {
+        development {
+            dimension 'flavor-type'
+            applicationIdSuffix '.dev'
+            versionNameSuffix '_dev'
+        }
+
+        production {
+            dimension 'flavor-type'
+        }
+    }
+}
+
+flutter {
+    source '../..'
+}
+
+dependencies {
+    // testImplementation 'junit:junit:4.12'
+    def supportLibVersion = rootProject.ext.supportLibVersion
+    androidTestImplementation 'androidx.test:runner:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+    implementation 'androidx.appcompat:appcompat:$supportLibVersion'
+    implementation 'com.google.firebase:firebase-iid:18.0.0'
+    implementation 'com.google.firebase:firebase-messaging:20.1.0'
+    implementation 'com.google.firebase:firebase-analytics:17.2.0'
+}
+
+// com.google.gms.googleservices.GoogleServicesPlugin.config.disableVersionCheck = true
+apply plugin: 'com.google.gms.google-services'

@@ -1,0 +1,12 @@
+version: '3'
+services:
+  flutter_tracker:
+    container_name: flutter_tracker
+    build:
+      context: .
+      dockerfile: Dockerfile
+    privileged: true
+    volumes:
+      - "/dev/bus/usb:/dev/bus/usb"
+    working_dir: /flutter_tracker
+    command: flutter run

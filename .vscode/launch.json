@@ -1,0 +1,25 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "FlutterTracker_DEV",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/main_dev.dart",
+      "args": [
+        "--flavor",
+        "development"
+      ]
+    },
+    {
+      "name": "FlutterTracker_PROD",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/main_prod.dart",
+      "args": [
+        "--flavor",
+        "production"
+      ]
+    }
+  ]
+}
