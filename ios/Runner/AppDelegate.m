@@ -8,7 +8,7 @@
     didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   NSString* mapsApiKey = [[NSProcessInfo processInfo] environment][@"MAPS_API_KEY"];
   if ([mapsApiKey length] == 0) {
-    mapsApiKey = @"AIzaSyC__CkJYkrV1QhAOFhVlMgiH76rz3QH_Ok"; // TODO: Remove this
+    mapsApiKey = @""; // TODO!: maps api this
   }
 
   [GMSServices provideAPIKey:mapsApiKey];
